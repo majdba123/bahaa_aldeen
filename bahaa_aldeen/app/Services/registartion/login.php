@@ -42,10 +42,17 @@ class login
 
             if ($user->type == 1) {
                 $userType = 'Admin'; // إذا كان المستخدم أدمن
-            } elseif ($user->vendor) { // التحقق إذا كان لديه سجل في vendor
-                $userType = 'Vendor';
+            } elseif ($user->employee->job->title == "BranchManager") { // التحقق إذا كان لديه سجل في vendor
+                $userType = 'BranchManager';
+            } elseif ($user->employee->job->title == "Accountant") { // التحقق إذا كان لديه سجل في vendor
+                $userType = 'Accountant';
             }
-
+            elseif ($user->employee->job->title == "HR") { // التحقق إذا كان لديه سجل في vendor
+                $userType = 'HR';
+            }
+            elseif ($user->employee->job->title == "SalesManager") { // التحقق إذا كان لديه سجل في vendor
+                $userType = 'SalesManager';
+            }
             // إرجاع التوكن ونوع المستخدم
             return response()->json([
                 'token' => $token,

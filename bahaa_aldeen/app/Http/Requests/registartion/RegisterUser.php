@@ -25,7 +25,6 @@ class RegisterUser extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'email' => 'nullable|string|email|max:255|unique:users', // Make email nullable
-            'phone' => 'nullable|string|max:20|unique:users', // Add phone field
             'password' => 'required|string|min:8',
 
         ];
@@ -37,7 +36,6 @@ class RegisterUser extends FormRequest
             'name.required' => 'Name is required.',
             'email.email' => 'The email must be a valid email address.',
             'email.unique' => 'Email has already been taken.',
-            'phone.unique' => 'Phone has already been taken.',
             'password.required' => 'Password is required.',
         ];
     }
@@ -51,18 +49,6 @@ class RegisterUser extends FormRequest
     }
 
 
-    public function withValidator(Validator $validator)
-    {
-        $validator->after(function ($validator) {
-            if (!$this->has('email') && !$this->has('phone')) {
-                $validator->errors()->add('email_or_phone', 'You must provide either an email address or a phone number.');
-            }elseif($this->has('email') && $this->has('phone'))
-            {
-                $validator->errors()->add('email_or_phone', 'You must provide either an email address or a phone number.');
-
-            }
-        });
-    }
 
 
 
