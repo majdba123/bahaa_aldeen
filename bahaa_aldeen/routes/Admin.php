@@ -4,6 +4,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\JobsController;
 use App\Http\Controllers\BranchesController;
+use App\Http\Controllers\EmployeesController;
+use App\Http\Controllers\EmployeeProfileController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,5 +30,25 @@ Route::middleware(['auth:sanctum','admin'])->group(function () {
         Route::put('update/{id}', [BranchesController::class, 'update']); // تحديث فرع
         Route::post('/filter', [BranchesController::class, 'filter']);
         Route::delete('delete/{id}', [BranchesController::class, 'destroy']); // حذف فرع
+    });
+
+
+    Route::prefix('employee')->group(function () {
+
+        Route::post('/store', [EmployeesController::class, 'store']); // إنشاء فرع جديد
+        Route::put('update/{id}', [EmployeesController::class, 'update']); // تحديث فرع
+        Route::get('/get_all', [EmployeesController::class, 'index']);
+
+        Route::get('/show/{id}', [EmployeesController::class, 'show']); // عرض فرع محدد
+        Route::post('/update_status/{employee_id}', [EmployeesController::class, 'updateStatus']);
+        //Route::post('/filter', [BranchesController::class, 'filter']);
+    });
+
+
+    Route::prefix('employee-profile')->group(function () {
+        Route::post('/store', [EmployeeProfileController::class, 'store']);
+        Route::put('/update/{employeeId}', [EmployeeProfileController::class, 'update']);
+        Route::get('/show/{employeeId}', [EmployeeProfileController::class, 'show']);
+        Route::delete('delete/{employeeId}', [EmployeeProfileController::class, 'destroy']);
     });
 });

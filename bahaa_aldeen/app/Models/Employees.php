@@ -13,7 +13,6 @@ class Employees extends Model
         'branch_id',
         'job_id',
         'user_id',
-        'name', // اسم الموظف
         'national_id', // رقم الهوية
         'nationality', // الجنسية
         'gender', // الجنس
@@ -22,6 +21,7 @@ class Employees extends Model
         'military_status', // حالة التجنيد
         'insurance_number', // الرقم التأميني
         'marital_status', // الحالة الاجتماعية
+        'status',
         'birthday',
     ];
 
@@ -40,4 +40,15 @@ class Employees extends Model
     {
         return $this->belongsTo(User::class ,'user_id');
     }
+
+    public function employmentDetails()
+    {
+        return $this->hasOne(EmploymentDetails::class);
+    }
+
+    public function profile()
+    {
+        return $this->hasOne(EmployeeProfile::class);
+    }
+
 }

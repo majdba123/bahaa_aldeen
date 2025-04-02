@@ -4,62 +4,94 @@ namespace App\Http\Controllers;
 
 use App\Models\Employees;
 use Illuminate\Http\Request;
+use App\Http\Requests\Employee\CreateEmployeeRequest; // استدعاء ملف الطلب
+use App\Http\Requests\Employee\UpdateEmployeeRequest; // استدعاء ملف الطلب
+
+use App\Services\Employee\EmployeeService; // استدعاء ملف الخدمة
+use Illuminate\Http\JsonResponse;
 
 class EmployeesController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    protected $employeeService;
+
+    // الربط بين الكنترولر والخدمة
+    public function __construct(EmployeeService $employeeService)
     {
-        //
+        $this->employeeService = $employeeService;
+
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function index(Request $request)
     {
-        //
+        $perPage = $request->get('per_page', 10); // Default to 10 records per page if not specified
+        $employees = $this->employeeService->getAllEmployeesWithDetails($perPage);
+
+        return response()->json($employees);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+
+    public function show($id)
     {
-        //
+        $employees = $this->employeeService->showEmployee($id);
+
+        return response()->json($employees);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Employees $employees)
+
+
+    public function store(CreateEmployeeRequest $request): JsonResponse
     {
-        //
+        try {
+            // استدعاء دالة الخدمة لإنشاء الموظف
+            $employee = $this->employeeService->createEmployee($request->validated());
+
+            return response()->json([
+                'message' => 'Employee created successfully.',
+                'employee' => $employee,
+            ], 201);
+        } catch (\Exception $e) {
+            // التعامل مع الأخطاء غير المتوقعة
+            return response()->json([
+                'message' => 'An error occurred while creating the employee.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Employees $employees)
+
+    public function update(UpdateEmployeeRequest $request, $employee_id): JsonResponse
     {
-        //
+        $employee=Employees::findorfail($employee_id);
+        try {
+            // استدعاء الخدمة لتحديث بيانات الموظف
+            $updatedEmployee = $this->employeeService->updateEmployee($request->validated(), $employee);
+
+            return response()->json([
+                'message' => 'Employee updated successfully.',
+                'employee' => $updatedEmployee,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'An error occurred while updating the employee.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Employees $employees)
+
+    public function updateStatus(Request $request, $id)
     {
-        //
+        $request->validate([
+            'status' => 'required|string|in:active,dismissed,on_leave',
+        ]);
+
+        $employee = Employees::findOrFail($id);
+        $updatedEmployee = $this->employeeService->updateEmployeeStatus($request->status, $employee);
+
+        return response()->json([
+            'message' => 'Employee status updated successfully.',
+            'employee' => $updatedEmployee,
+        ]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Employees $employees)
-    {
-        //
-    }
 }
