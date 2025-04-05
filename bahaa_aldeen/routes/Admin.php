@@ -6,6 +6,8 @@ use App\Http\Controllers\JobsController;
 use App\Http\Controllers\BranchesController;
 use App\Http\Controllers\EmployeesController;
 use App\Http\Controllers\EmployeeProfileController;
+use App\Http\Controllers\ProductModelController;
+use App\Http\Controllers\InventoryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -45,10 +47,27 @@ Route::middleware(['auth:sanctum','admin'])->group(function () {
     });
 
 
-    Route::prefix('employee-profile')->group(function () {
+    Route::prefix('employee_profile')->group(function () {
         Route::post('/store', [EmployeeProfileController::class, 'store']);
         Route::put('/update/{employeeId}', [EmployeeProfileController::class, 'update']);
         Route::get('/show/{employeeId}', [EmployeeProfileController::class, 'show']);
         Route::delete('delete/{employeeId}', [EmployeeProfileController::class, 'destroy']);
     });
+
+    Route::prefix('inventory')->group(function () {
+
+        Route::prefix('product')->group(function () {
+            Route::get('/get_latest', [ProductModelController::class, 'latest_product']);
+            Route::post('/store', [ProductModelController::class, 'store']);
+            Route::post('/update/{model_id}', [ProductModelController::class, 'update']);
+            Route::delete('delete/{model_id}', [ProductModelController::class, 'destroy']);
+            Route::get('/show/{model_id}', [ProductModelController::class, 'show']);
+            Route::get('filter', [ProductModelController::class, 'filterProducts']);
+        });
+
+        Route::get('/get_all', [InventoryController::class, 'index']);
+
+    });
+
+
 });

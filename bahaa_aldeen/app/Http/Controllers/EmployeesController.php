@@ -86,7 +86,8 @@ class EmployeesController extends Controller
         ]);
 
         $employee = Employees::findOrFail($id);
-        $updatedEmployee = $this->employeeService->updateEmployeeStatus($request->status, $employee);
+
+        $updatedEmployee = $this->employeeService->updateEmployeeStatus($employee,$request->status);
 
         return response()->json([
             'message' => 'Employee status updated successfully.',

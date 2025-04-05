@@ -9,7 +9,7 @@ class EmployeeProfile extends Model
 {
     use HasFactory;
         protected $fillable = [
-        'employee_id',
+        'employees_id',
         'college',
         'major',
         'university',
@@ -22,6 +22,6 @@ class EmployeeProfile extends Model
 
     public function employee()
     {
-        return $this->belongsTo(Employees::class, 'employee_id');
+        return $this->belongsTo(Employees::class, 'employees_id');
     }
 }

@@ -32,13 +32,13 @@ class EmployeeProfileController extends Controller
 
     public function show($employeeId)
     {
-        $employeeProfile = EmployeeProfile::where('employee_id', $employeeId)->firstOrFail();
+        $employeeProfile = EmployeeProfile::where('employees_id', $employeeId)->firstOrFail();
         return response()->json($employeeProfile, 200);
     }
 
     public function update(EmployeeProfileUpdateRequest $request, $employeeId)
     {
-        $employeeProfile = EmployeeProfile::where('employee_id', $employeeId)->firstOrFail(); // البحث عن الموديل باستخدام employee_id
+        $employeeProfile = EmployeeProfile::where('employees_id', $employeeId)->firstOrFail(); // البحث عن الموديل باستخدام employee_id
         $data = $request->validated();
         $this->employeeService->update_profile($employeeProfile, $data); // إرسال الموديل إلى الخدمة
         return response()->json($employeeProfile, 200);
@@ -46,7 +46,7 @@ class EmployeeProfileController extends Controller
 
     public function destroy($employeeId)
     {
-        $employeeProfile = EmployeeProfile::where('employee_id', $employeeId)->firstOrFail(); // البحث عن الموديل باستخدام employee_id
+        $employeeProfile = EmployeeProfile::where('employees_id', $employeeId)->firstOrFail(); // البحث عن الموديل باستخدام employee_id
         $this->employeeService->delete_profile($employeeProfile); // إرسال الموديل إلى الخدمة
         return response()->json(null, 204);
     }

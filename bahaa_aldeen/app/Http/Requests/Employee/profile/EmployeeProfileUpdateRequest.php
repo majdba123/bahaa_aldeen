@@ -16,7 +16,6 @@ class EmployeeProfileUpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            'employee_id' => 'nullable|exists:employees,id', // يمكن أن يكون فارغًا إذا لم يتم إرساله
             'college' => 'nullable|string|max:255',
             'major' => 'nullable|string|max:255',
             'university' => 'nullable|string|max:255',
@@ -31,7 +30,6 @@ class EmployeeProfileUpdateRequest extends FormRequest
     public function messages()
     {
         return [
-            'employee_id.exists' => 'معرف الموظف غير موجود.',
             'college.string' => 'اسم الكلية يجب أن يكون نصيًا.',
             'college.max' => 'اسم الكلية يجب ألا يزيد عن 255 حرفًا.',
             'major.string' => 'التخصص يجب أن يكون نصيًا.',

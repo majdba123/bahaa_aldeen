@@ -15,7 +15,8 @@ class EmployeeProfileStoreRequest extends FormRequest
     public function rules()
     {
         return [
-            'employee_id' => 'required|exists:employees,id',
+
+            'employees_id' => 'required|exists:employees,id|unique:employee_profiles,employees_id',
             'college' => 'required|string|max:255',
             'major' => 'required|string|max:255',
             'university' => 'required|string|max:255',

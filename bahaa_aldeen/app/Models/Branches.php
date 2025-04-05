@@ -21,4 +21,18 @@ class Branches extends Model
     {
         return $this->hasMany(Employees::class);
     }
+
+
+    public function inventory()
+    {
+        return $this->hasOne(Inventory::class);
+    }
+
+    protected static function booted()
+    {
+        static::created(function ($branch) {
+            // إنشاء مخزون تلقائي عند إنشاء فرع جديد
+            $branch->inventory()->create();
+        });
+    }
 }
