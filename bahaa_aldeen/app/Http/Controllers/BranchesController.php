@@ -58,12 +58,16 @@ class BranchesController extends Controller
             'branch_name' => 'nullable|string|max:255',
             'branch_number' => 'nullable|integer',
             'location' => 'nullable|string|max:255',
+            'per_page' => 'nullable|integer|min:1|max:100',
         ], [
             'branch_name.string' => 'اسم الفرع يجب أن يكون نصاً.',
             'branch_name.max' => 'اسم الفرع يجب ألا يزيد عن 255 حرفاً.',
             'branch_number.integer' => 'رقم الفرع يجب أن يكون رقماً صحيحاً.',
             'location.string' => 'الموقع يجب أن يكون نصاً.',
             'location.max' => 'الموقع يجب ألا يزيد عن 255 حرفاً.',
+            'per_page.integer' => 'عدد العناصر لكل صفحة يجب أن يكون رقماً صحيحاً.',
+            'per_page.min' => 'يجب أن يكون عدد العناصر لكل صفحة على الأقل 1.',
+            'per_page.max' => 'يجب ألا يزيد عدد العناصر لكل صفحة عن 100.',
         ]);
 
         // التحقق من وجود أخطاء
@@ -76,8 +80,13 @@ class BranchesController extends Controller
             return !is_null($value); // استبعاد القيم الفارغة
         });
 
+        $perPage = $request->input('per_page', 10);
+
+        // جلب النتائج من الخدمة مع تحديد عدد العناصر لكل صفحة
+        $branches = $this->branchService->filterBranches($filters, $perPage);
+
         // جلب النتائج من الخدمة
-        $branches = $this->branchService->filterBranches($filters);
+        $branches = $this->branchService->filterBranches($filters,);
 
         return response()->json($branches);
     }
