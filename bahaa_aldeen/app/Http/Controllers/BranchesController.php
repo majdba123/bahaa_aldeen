@@ -76,11 +76,6 @@ class BranchesController extends Controller
             return !is_null($value); // استبعاد القيم الفارغة
         });
 
-        // التحقق إذا لم يتم إرسال أي فلتر
-        if (empty($filters)) {
-            return response()->json(['error' => 'يجب إرسال قيمة واحدة على الأقل للفلترة.'], 422);
-        }
-
         // جلب النتائج من الخدمة
         $branches = $this->branchService->filterBranches($filters);
 

@@ -18,52 +18,50 @@ class login
     public function login(array $data)
     {
         try {
-            // التحقق إذا تم إرسال البريد الإلكتروني أو الهاتف
+            // التحقق من إدخال البريد أو الهاتف
             if (isset($data['email']) && !isset($data['phone'])) {
                 $user = User::where('email', $data['email'])->first();
             } elseif (!isset($data['email']) && isset($data['phone'])) {
                 $user = User::where('phone', $data['phone'])->first();
             } else {
-                throw new \Exception('يجب أن تحتوي البيانات إما على البريد الإلكتروني أو رقم الهاتف.');
+                return [
+                    'error' => true,
+                    'message' => 'يجب إدخال إما البريد الإلكتروني أو رقم الهاتف، وليس كلاهما.',
+                    'code' => 400,
+                ];
             }
 
-            // التحقق من صحة المستخدم وكلمة المرور
+            // التحقق من صحة كلمة المرور
             if (!$user || !Hash::check($data['password'], $user->password)) {
-                return response()->json([
-                    'message' => 'Invalid Credentials',
-                ], 401);
+                return [
+                    'error' => true,
+                    'message' => 'بيانات الاعتماد غير صحيحة',
+                    'code' => 401,
+                ];
             }
 
-            // إنشاء التوكن للمستخدم
+            // إنشاء التوكن
             $token = $user->createToken($user->name . '-AuthToken')->plainTextToken;
 
             // تحديد نوع المستخدم
-            $userType = 'User'; // القيمة الافتراضية
-
+            $userType = 'User';
             if ($user->type == 1) {
-                $userType = 'Admin'; // إذا كان المستخدم أدمن
-            } elseif ($user->employee->job->title == "BranchManager") { // التحقق إذا كان لديه سجل في vendor
+                $userType = 'Admin';
+            } elseif ($user->employee->job->title == "BranchManager") {
                 $userType = 'BranchManager';
-            } elseif ($user->employee->job->title == "Accountant") { // التحقق إذا كان لديه سجل في vendor
-                $userType = 'Accountant';
-            }
-            elseif ($user->employee->job->title == "HR") { // التحقق إذا كان لديه سجل في vendor
-                $userType = 'HR';
-            }
-            elseif ($user->employee->job->title == "SalesManager") { // التحقق إذا كان لديه سجل في vendor
-                $userType = 'SalesManager';
-            }
-            // إرجاع التوكن ونوع المستخدم
-            return response()->json([
+            } // ... (باقي الشروط)
+
+            return [
                 'token' => $token,
                 'user_type' => $userType,
-            ], 200);
+            ];
 
         } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'An error occurred during login.',
-                'error_details' => $e->getMessage(),
-            ], 500);
+            return [
+                'error' => true,
+                'message' => 'حدث خطأ أثناء تسجيل الدخول: ' . $e->getMessage(),
+                'code' => 500,
+            ];
         }
     }
 

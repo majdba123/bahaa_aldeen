@@ -26,7 +26,7 @@ Route::middleware(['auth:sanctum','admin'])->group(function () {
 
 
     Route::prefix('branches')->group(function () {
-        Route::get('/get_all', [BranchesController::class, 'index']); // عرض جميع الفروع
+     //   Route::get('/get_all', [BranchesController::class, 'index']); // عرض جميع الفروع
         Route::get('/show/{id}', [BranchesController::class, 'show']); // عرض فرع محدد
         Route::post('/store', [BranchesController::class, 'store']); // إنشاء فرع جديد
         Route::put('update/{id}', [BranchesController::class, 'update']); // تحديث فرع
