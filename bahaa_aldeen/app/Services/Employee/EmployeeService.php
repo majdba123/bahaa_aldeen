@@ -21,7 +21,7 @@ class EmployeeService
                 'password' => Hash::make($data['password']),
             ]);
 
-            // إضافة بيانات الموظف إلى الموديل
+            // إضافة بيانات الموظف
             $employee = Employees::create([
                 'user_id' => $user->id,
                 'branch_id' => $data['branch_id'],
@@ -46,33 +46,28 @@ class EmployeeService
                 'salary' => $data['salary'] ?? null,
             ]);
 
-            return $employee;
+            // جلب البيانات المحدثة مع العلاقات
+            return Employees::with(['user', 'employmentDetails'])->find($employee->id);
         });
     }
 
     public function updateEmployee(array $data, Employees $employee)
     {
         return DB::transaction(function () use ($data, $employee) {
-            // تحديث بيانات المستخدم (User)
-            if (isset($data['email']) || isset($data['password']) || isset($data['name'])) {
-                $user = $employee->user;
+            // تحديث بيانات المستخدم
+            $userData = array_filter([
+                'email' => $data['email'] ?? null,
+                'password' => isset($data['password']) ? Hash::make($data['password']) : null,
+                'name' => $data['name'] ?? null
+            ], function($value) {
+                return $value !== null;
+            });
 
-                if (isset($data['email'])) {
-                    $user->email = $data['email'];
-                }
-
-                if (isset($data['password'])) {
-                    $user->password = Hash::make($data['password']);
-                }
-
-                if (isset($data['name'])) {
-                    $user->name = $data['name'];
-                }
-
-                $user->save();
+            if (!empty($userData)) {
+                $employee->user()->update($userData);
             }
 
-            // تحديث بيانات الموظف (Employee)
+            // تحديث بيانات الموظف
             $employee->update([
                 'branch_id' => $data['branch_id'] ?? $employee->branch_id,
                 'job_id' => $data['job_id'] ?? $employee->job_id,
@@ -87,21 +82,25 @@ class EmployeeService
                 'birthday' => $data['birthday'] ?? $employee->birthday,
             ]);
 
-            // تحديث تفاصيل التوظيف (EmploymentDetails)
+            // تحديث أو إنشاء تفاصيل التوظيف
+            $employmentDetailsData = [
+                'working_hours_from' => $data['working_hours_from'] ?? $employee->employmentDetails->working_hours_from ?? null,
+                'working_hours_to' => $data['working_hours_to'] ?? $employee->employmentDetails->working_hours_to ?? null,
+                'commission_type' => $data['commission_type'] ?? $employee->employmentDetails->commission_type ?? null,
+                'commission_value' => $data['commission_value'] ?? $employee->employmentDetails->commission_value ?? null,
+                'salary' => $data['salary'] ?? $employee->employmentDetails->salary ?? null,
+            ];
+
             if ($employee->employmentDetails) {
-                $employee->employmentDetails->update([
-                    'working_hours_from' => $data['working_hours_from'] ?? $employee->employmentDetails->working_hours_from,
-                    'working_hours_to' => $data['working_hours_to'] ?? $employee->employmentDetails->working_hours_to,
-                    'commission_type' => $data['commission_type'] ?? $employee->employmentDetails->commission_type,
-                    'commission_value' => $data['commission_value'] ?? $employee->employmentDetails->commission_value,
-                    'salary' => $data['salary'] ?? $employee->employmentDetails->salary,
-                ]);
+                $employee->employmentDetails()->update($employmentDetailsData);
+            } else {
+                $employee->employmentDetails()->create($employmentDetailsData);
             }
 
-            return $employee;
+            // جلب البيانات المحدثة مع العلاقات بنفس طريقة الإنشاء
+            return Employees::with(['user', 'employmentDetails'])->find($employee->id);
         });
     }
-
 
     public function getAllEmployeesWithDetails(int $perPage = 10)
     {
